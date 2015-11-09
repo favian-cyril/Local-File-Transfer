@@ -33,7 +33,7 @@ class ClientThread(Thread):
                 f.close()
                 break
             
-    def createMD5SUM():
+    def createMD5SUM(self):
         x = md5sum.grab_files('.')
         lista = []
         for i in x:
@@ -41,7 +41,10 @@ class ClientThread(Thread):
         lista.append((i[0],y))
         md5sum.createFile(lista)
         
-    def md5Compare():
+    def md5Compare(self):
+        """
+        TODO: Not final, needs to find file difference
+        """
         clientMD5 = open('MD5SUM'+str(port)+'.txt')
         while True:
             data = self.sock.recv(BUFFER_SIZE)
@@ -56,7 +59,13 @@ class ClientThread(Thread):
             self.sock.send('Files Match'.encode('ascii'))
         else:
             self.sock.send('Files does not Match'.encode('ascii'))              
-        
+    
+    def recMD5SUM(self):
+        """
+        Recieve MD5SUM.txt from client
+        """
+        pass
+    
         
         
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
