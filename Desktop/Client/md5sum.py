@@ -40,7 +40,11 @@ def createFile(arrPath,name='MD5SUM.txt'):
     for name, filedir in arrPath:
         print(name, filedir, file=filetext)
     print("File MD5SUM Created")
-
+def compareFileDifference(checksum1, checksum2):
+    """
+    TODO: Compare actual file difference and return false if no difference else return list containing file difference w/ path
+    """
+    pass
 ##x = grab_files('.')
 ##lista = []
 ##for i in x:
