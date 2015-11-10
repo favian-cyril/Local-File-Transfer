@@ -17,11 +17,12 @@ class ClientThread(Thread):
 
     def run(self):
         protocol = self.sock.recv(BUFFER_SIZE)
-        if protocol == 'MD5SUM_FILE':
-            self.createMD5SUM(self)
-            self.recMD5SUM(self)
+        if protocol == 'MD5SUM_COMPARE':
+            self.createMD5SUM()
+            md5client = self.recFile()
+            createFile(md5client, 'MD5Client\\MD5SUM'+str(port)+'.txt')
             
-    def sendFile(filename='Data\\Text.txt'):
+    def sendFile(self, filename='Data\\Text.txt'):
         f = open(filename,'rb')
         while True:
             l = f.read(BUFFER_SIZE)
@@ -40,6 +41,7 @@ class ClientThread(Thread):
             y = md5sum.md5(i[1])
         lista.append((i[0],y))
         md5sum.createFile(lista)
+        print('MD5SUM.txt Created')
         
     def md5Compare(self):
         """
@@ -52,7 +54,7 @@ class ClientThread(Thread):
                 clientMD5.close()
                 break
             clientMD5.write(data)
-        clientHash = md5sum.md5('MD5SUM'+str(port)+'.txt')
+        clientHash = md5sum.md5('MD5Client\\MD5SUM'+str(port)+'.txt')
         serverHash = md5sum.md5('MD5SUM.txt')
         result = md5sum.compareMD5(clientHash, serverHash)
         if result:
@@ -60,12 +62,15 @@ class ClientThread(Thread):
         else:
             self.sock.send('Files does not Match'.encode('ascii'))              
     
-    def recMD5SUM(self):
+    def recFile(self):
         """
-        Recieve MD5SUM.txt from client
+        Recieve single file from client
         """
-        pass
-    
+        while True:
+            data = sock.recv(BUFFER_SIZE)
+            if not data:
+                break
+        return data
         
         
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
