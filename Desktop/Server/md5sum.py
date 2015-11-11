@@ -40,11 +40,33 @@ def createFile(arrPath,name='MD5SUM.txt'):
     for name, filedir in arrPath:
         print(name, filedir, file=filetext)
     print("File MD5SUM Created")
-def compareFileDifference(checksum1, checksum2):
+def compareFileDifference(checksum1 = None, checksum2 = None):
     """
-    TODO: Compare actual file difference and return false if no difference else return list containing file difference w/ path
+    TODO: Compare actual file difference and
+    return a list with status of file
     """
-    pass
+    # Open Files
+    fileMD = open(checksum1, "r").read()
+    fileMDOutput = open(checksum2, "r").read()
+    # Split 'em and put 'em as dicks
+    listMD = fileMD.split()
+    listMDOutput = fileMDOutput.split()
+    dictMD = dict(zip(*[iter(listMD)]*2))
+    dictMDOutput = dict(zip(*[iter(listMDOutput)]*2))
+    # Determine which have the same key and same md5 value
+    result = []
+    for key in dictMD:
+        if key in dictMDOutput:
+            if dictMD[key] == dictMDOutput[key]: 
+                result.append((key, "MATCH"))
+            elif dictMD[key] != dictMDOutput[key]:
+                result.append((key, "MISMATCH"))
+        if key not in dictMDOutput:
+            result.append((key, "NOT FOUND IN CLIENT"))
+    for key in dictMDOutput:
+        if key not in dictMD:
+            result.append((key, "NOT FOUND IN SERVER"))
+    return result
 ##x = grab_files('.')
 ##lista = []
 ##for i in x:
