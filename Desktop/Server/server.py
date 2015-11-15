@@ -27,14 +27,15 @@ class ClientThread(Thread):
                 if status == 'MISMATCH' or status == 'MISSING':
                     self.sock.send(file.encode('ascii'))
                     self.sendFile(file)
-                
+            self.sock.send('FILES_MATCH'.encode('ascii'))
+            
     def sendFile(self, filename):
         file = open(filename,'rb')
         while True:
             data = file.read(BUFFER_SIZE)
             while data:
                 self.sock.send(data)
-                print('Sent ',repr(data))
+                print('Sent ',filename)
                 data = file.read(BUFFER_SIZE)
             if not data:
                 time.sleep(0.1)
@@ -72,9 +73,7 @@ threads = []
 
 while True:
     tcpsock.listen(5)
-    print("Waiting for incoming connections...")
     (conn, (ip,port)) = tcpsock.accept()
-    print('Got connection from ', (ip,port))
     newthread = ClientThread(ip,port,conn)
     newthread.start()
     threads.append(newthread)

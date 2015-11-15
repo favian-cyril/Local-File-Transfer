@@ -52,4 +52,8 @@ def closeConnection():
 createMD5SUM()
 sendMD5SUM()
 name = sock.recv(BUFFER_SIZE)
-recFile(name.decode('ascii'))
+if name.decode('ascii') == 'FILES_MATCH':
+    closeConnection()
+else:
+    recFile(name.decode('ascii'))
+
