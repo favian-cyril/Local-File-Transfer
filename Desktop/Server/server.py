@@ -17,12 +17,14 @@ class ClientThread(Thread):
 
     def run(self):
         protocol = self.sock.recv(BUFFER_SIZE)
-        if protocol == 'MD5SUM_COMPARE':
+        if protocol.decode('ascii') == 'MD5SUM_COMPARE':
             self.createMD5SUM()
-            md5client = self.recFile()
-            createFile(md5client, 'MD5Client\\MD5SUM'+str(port)+'.txt')
-            
-    def sendFile(self, filename='Data\\Text.txt'):
+            self.recFile(name='MD5Client\\MD5SUM'+str(port)+'.txt')
+            listDiff = md5sum.compareFileDifference('MD5SUM.txt','MD5Client\\MD5SUM'+str(port)+'.txt')
+            for (file, status) in listDiff:
+                if status == 'MISMATCH':
+                    self.sendFile(file)
+    def sendFile(self, filename):
         f = open(filename,'rb')
         while True:
             l = f.read(BUFFER_SIZE)
@@ -31,46 +33,31 @@ class ClientThread(Thread):
                 print('Sent ',repr(l))
                 l = f.read(BUFFER_SIZE)
             if not l:
+                self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
                 f.close()
                 break
             
     def createMD5SUM(self):
-        x = md5sum.grab_files('.')
+        x = md5sum.grab_files('Data\\')
         lista = []
         for i in x:
-            y = md5sum.md5(i[1])
-        lista.append((i[0],y))
+            y = md5sum.md5(i)
+            lista.append((i,y))
         md5sum.createFile(lista)
-        print('MD5SUM.txt Created')
-        
-    def md5Compare(self):
-        """
-        TODO: Not final, needs to find file difference
-        """
-        clientMD5 = open('MD5SUM'+str(port)+'.txt')
-        while True:
-            data = self.sock.recv(BUFFER_SIZE)
-            if not data:
-                clientMD5.close()
-                break
-            clientMD5.write(data)
-        clientHash = md5sum.md5('MD5Client\\MD5SUM'+str(port)+'.txt')
-        serverHash = md5sum.md5('MD5SUM.txt')
-        result = md5sum.compareMD5(clientHash, serverHash)
-        if result:
-            self.sock.send('Files Match'.encode('ascii'))
-        else:
-            self.sock.send('Files does not Match'.encode('ascii'))              
-    
-    def recFile(self):
+            
+    def recFile(self, name):
         """
         Recieve single file from client
         """
-        while True:
-            data = sock.recv(BUFFER_SIZE)
-            if not data:
-                break
-        return data
+        
+        with open(name, 'wb') as f:
+            while True:
+                print('receiving data...')
+                data = self.sock.recv(BUFFER_SIZE)
+                if data.decode('ascii') == 'END_FILE_TRANSFER':
+                    break
+                f.write(data)
+        f.close()
         
         
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

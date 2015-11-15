@@ -28,8 +28,8 @@ def grab_files(directory):
     arrPath = []
     for root, dirs, files in os.walk(directory):
         for name in files:
-            filedir = os.path.join(os.getcwd(),root,name)          
-            arrPath.append((name,filedir))
+            filedir = os.path.join(root,name)          
+            arrPath.append((filedir))
     return arrPath
 
 def createFile(arrPath,name='MD5SUM.txt'):
@@ -67,6 +67,8 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
         if key not in dictMD:
             result.append((key, "NOT FOUND IN SERVER"))
     return result
+
+
 ##x = grab_files('.')
 ##lista = []
 ##for i in x:
