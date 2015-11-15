@@ -1,5 +1,6 @@
 import socket
 import md5sum
+import time
 from threading import Thread
 
 TCP_IP = 'localhost'
@@ -21,20 +22,24 @@ class ClientThread(Thread):
             self.createMD5SUM()
             self.recFile(name='MD5Client\\MD5SUM'+str(port)+'.txt')
             listDiff = md5sum.compareFileDifference('MD5SUM.txt','MD5Client\\MD5SUM'+str(port)+'.txt')
+            print(listDiff)
             for (file, status) in listDiff:
-                if status == 'MISMATCH':
+                if status == 'MISMATCH' or status == 'MISSING':
+                    self.sock.send(file.encode('ascii'))
                     self.sendFile(file)
+                
     def sendFile(self, filename):
-        f = open(filename,'rb')
+        file = open(filename,'rb')
         while True:
-            l = f.read(BUFFER_SIZE)
-            while (l):
-                self.sock.send(l)
-                print('Sent ',repr(l))
-                l = f.read(BUFFER_SIZE)
-            if not l:
+            data = file.read(BUFFER_SIZE)
+            while data:
+                self.sock.send(data)
+                print('Sent ',repr(data))
+                data = file.read(BUFFER_SIZE)
+            if not data:
+                time.sleep(0.1)
                 self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
-                f.close()
+                file.close()
                 break
             
     def createMD5SUM(self):

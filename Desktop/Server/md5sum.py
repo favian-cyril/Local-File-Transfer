@@ -62,10 +62,10 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
             elif dictMD[key] != dictMDOutput[key]:
                 result.append((key, "MISMATCH"))
         if key not in dictMDOutput:
-            result.append((key, "NOT FOUND IN CLIENT"))
+            result.append((key, "MISSING"))
     for key in dictMDOutput:
         if key not in dictMD:
-            result.append((key, "NOT FOUND IN SERVER"))
+            result.append((key, "MISSING"))
     return result
 
 
