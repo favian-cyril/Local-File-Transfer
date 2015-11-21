@@ -1,6 +1,7 @@
 import socket
 import md5sum
 import time
+import os
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -33,18 +34,55 @@ def sendMD5SUM():
             break
     
 def recFile(name):
-    with open(name, 'wb') as f:
-        print('file opened')
-        while True:
-            #print('receiving data...')
-            data = sock.recv(BUFFER_SIZE)
-            print('data=%s', (data))
-            if data.decode('ascii') == 'END_FILE_TRANSFER':
-                f.close()
-                print('file close()')
-                break
-            # write data to a file
-            f.write(data)
+    """
+    Recieve and create file, if directory not found then create
+    directory 
+    """
+    try:
+        with open(name, 'wb') as f:
+            while True:
+                data = sock.recv(BUFFER_SIZE)
+                print('data=%s', (data.decode('ascii')))
+                if data.decode('ascii') == 'END_FILE_TRANSFER':
+                    f.close()
+                    print('file close()')
+                    break
+                f.write(data)
+    except FileNotFoundError:
+        os.chdir(FILE_PATH)
+        name = name.split('\\')
+        filepath = name[:-1]
+        filepath = filepath[1:]
+        for path in filepath:
+            try:
+                os.mkdir(path)
+            except FileExistsError:
+                pass
+            os.chdir(path)
+        with open(name[-1], 'wb') as f:
+            while True:
+                data = sock.recv(BUFFER_SIZE)
+                print('data=%s', (data.decode('ascii')))
+                if data.decode('ascii') == 'END_FILE_TRANSFER':
+                    f.close()
+                    print('file close()')
+                    break
+                f.write(data)
+
+def sendFile(self, filename):
+    file = open(filename,'rb')
+    while True:
+        data = file.read(BUFFER_SIZE)
+        while data:
+            self.sock.send(data)
+            print('Sent ',filename)
+            data = file.read(BUFFER_SIZE)
+        if not data:
+            time.sleep(0.1)
+            self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
+            file.close()
+            break
+
 def closeConnection():
     sock.close()
     print('connection closed')
