@@ -92,7 +92,7 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
             result.append((key, "MISSING"))
     return result
 
-<<<<<<< HEAD
+
 
 ##    x = md5sum.grab_files(FILE_PATH)
 ##    lista = []
@@ -100,13 +100,6 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
 ##        y = md5sum.md5(i)
 ##        lista.append((i,y))
 ##    md5sum.createFile(lista)
-=======
-##x = grab_files('.')
-##lista = []
-##for i in x:
-##    y = md5(i[1])
-##    lista.append((i[0],y))
-##createFile(lista)
->>>>>>> e75be73668e5d8709482f7e439f9a6127dc0e4c4
+
 
     
