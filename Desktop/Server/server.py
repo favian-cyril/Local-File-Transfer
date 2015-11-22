@@ -72,7 +72,7 @@ class ClientThread(Thread):
         try:
             with open(name, 'wb') as f:
                 while True:
-                    data = sock.recv(BUFFER_SIZE)
+                    data = self.sock.recv(BUFFER_SIZE)
                     print('data=%s', (data.decode('ascii')))
                     if data.decode('ascii') == 'END_FILE_TRANSFER':
                         f.close()
@@ -92,7 +92,7 @@ class ClientThread(Thread):
                 os.chdir(path)
             with open(name[-1], 'wb') as f:
                 while True:
-                    data = sock.recv(BUFFER_SIZE)
+                    data = self.sock.recv(BUFFER_SIZE)
                     print('data=%s', (data.decode('ascii')))
                     if data.decode('ascii') == 'END_FILE_TRANSFER':
                         f.close()

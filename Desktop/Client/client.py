@@ -71,16 +71,18 @@ def recFile(name):
 
 def sendFile(filename):
     sock.send('FILE_UPLOAD'.encode('ascii'))
+    time.sleep(0.1)
+    sock.send(filename.encode('ascii'))
     file = open(filename,'rb')
     while True:
         data = file.read(BUFFER_SIZE)
         while data:
-            self.sock.send(data)
+            sock.send(data)
             print('Sent ',filename)
             data = file.read(BUFFER_SIZE)
         if not data:
             time.sleep(0.1)
-            self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
+            sock.send('END_FILE_TRANSFER'.encode('ascii'))
             file.close()
             break
 
