@@ -128,11 +128,22 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
     return result
 
 
+<<<<<<< HEAD
 ##x = grab_files('.')
 ##lista = []
 ##for i in x:
 ##    y = md5(i[1])
 ##    lista.append((i[0],y))
 ##createFile(lista)
+=======
+
+##    x = md5sum.grab_files(FILE_PATH)
+##    lista = []
+##    for i in x:
+##        y = md5sum.md5(i)
+##        lista.append((i,y))
+##    md5sum.createFile(lista)
+
+>>>>>>> origin/master
 
     
