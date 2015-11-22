@@ -49,8 +49,8 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
     fileMD = open(checksum1, "r").read()
     fileMDOutput = open(checksum2, "r").read()
     # Split 'em and put 'em as dicks
-    listMD = fileMD.split()
-    listMDOutput = fileMDOutput.split()
+    listMD = fileMD.split("\n")
+    listMDOutput = fileMDOutput.split("\n")
     dictMD = dict(zip(*[iter(listMD)]*2))
     dictMDOutput = dict(zip(*[iter(listMDOutput)]*2))
     # Determine which have the same key and same md5 value
