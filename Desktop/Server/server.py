@@ -28,6 +28,14 @@ class ClientThread(Thread):
                     self.sock.send(file.encode('ascii'))
                     self.sendFile(file)
             self.sock.send('FILES_MATCH'.encode('ascii'))
+        if protocol.decode('ascii') == 'FILE_UPLOAD':
+            name = self.sock.recv(BUFFER_SIZE)
+            self.recFile(name.decode('ascii'))
+            self.createMD5SUM()
+        if protocol.decode('ascii') == 'FILE_DELETE':
+            name = self.sock.recv(BUFFER_SIZE)
+            os.removedirs(name)
+            self.createMD5SUM()
             
     def sendFile(self, filename):
         file = open(filename,'rb')
@@ -55,16 +63,36 @@ class ClientThread(Thread):
         """
         Recieve single file from client
         """
-        
-        with open(name, 'wb') as f:
-            while True:
-                print('receiving data...')
-                data = self.sock.recv(BUFFER_SIZE)
-                if data.decode('ascii') == 'END_FILE_TRANSFER':
-                    break
-                f.write(data)
-        f.close()
-        
+        try:
+            with open(name, 'wb') as f:
+                while True:
+                    data = sock.recv(BUFFER_SIZE)
+                    print('data=%s', (data.decode('ascii')))
+                    if data.decode('ascii') == 'END_FILE_TRANSFER':
+                        f.close()
+                        print('file close()')
+                        break
+                    f.write(data)
+        except FileNotFoundError:
+            os.chdir(FILE_PATH)
+            name = name.split('\\')
+            filepath = name[:-1]
+            filepath = filepath[1:]
+            for path in filepath:
+                try:
+                    os.mkdir(path)
+                except FileExistsError:
+                    pass
+                os.chdir(path)
+            with open(name[-1], 'wb') as f:
+                while True:
+                    data = sock.recv(BUFFER_SIZE)
+                    print('data=%s', (data.decode('ascii')))
+                    if data.decode('ascii') == 'END_FILE_TRANSFER':
+                        f.close()
+                        print('file close()')
+                        break
+                    f.write(data)
         
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
