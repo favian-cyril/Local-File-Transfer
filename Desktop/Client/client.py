@@ -69,7 +69,8 @@ def recFile(name):
                     break
                 f.write(data)
 
-def sendFile(self, filename):
+def sendFile(filename):
+    sock.send('FILE_UPLOAD'.encode('ascii'))
     file = open(filename,'rb')
     while True:
         data = file.read(BUFFER_SIZE)
@@ -82,6 +83,10 @@ def sendFile(self, filename):
             self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
             file.close()
             break
+
+def delFile(filename):
+    sock.send('FILE_DELETE'.encode('ascii'))
+    sock.send(filename.encode('ascii'))
 
 def closeConnection():
     sock.close()
