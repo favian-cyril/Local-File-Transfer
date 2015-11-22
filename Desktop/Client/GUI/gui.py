@@ -29,7 +29,7 @@ class Window(Tk):
         # Initialize 'Sync Kong' main window after user has connected
         self.top = Toplevel()
         self.top.title("Sync Kong")
-        self.top.geometry("600x400+30+30")
+        self.top.geometry("1200x500+30+30")
         self.top.transient(self)
         self.wButton.config(state='disabled')
         
