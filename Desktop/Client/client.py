@@ -2,13 +2,60 @@ import socket
 import md5sum
 import time
 import os
+import argparse
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 1024
 FILE_PATH = 'Data\\'
 
+def setInit(args):
+    global TCP_IP, TCP_PORT, FILE_PATH
+    TCP_IP = args.ip
+    TCP_PORT = args.port
+    FILE_PATH = args.file
 
+def run():
+    if not os.access(FILE_PATH, os.F_OK):
+        os.mkdir(FILE_PATH)
+    print('Syncing with server...')
+    date = sock.recv(BUFFER_SIZE)
+    print('Server time is {}'.format(date.decode('ascii')))
+    checkWithServer()
+    print('Client Up-to-date')
+    while True:
+        time.sleep(3)
+        if not updateLocalFiles():
+            checkWithServer()
+        time.sleep(3)
+        
+    
+def updateLocalFiles():
+    change = False
+    result = md5sum.compareLocalMD5(FILE_PATH)
+    for (file,status) in result:
+        if status == 'UPDATE' or status == 'UPLOAD':
+            sendFile(file)
+            change = True
+            print('Changes Sent')
+        elif status == 'DELETE':
+            delFile(file)
+            change = True
+            print('Changes Sent')
+        elif status == 'MATCH':
+            pass
+    createMD5SUM()
+    return change
+def checkWithServer():
+    createMD5SUM()
+    sendMD5SUM()
+    while True:
+        name = sock.recv(BUFFER_SIZE)
+        if name.decode('ascii') == 'FILES_MATCH':
+            break
+        recFile(name.decode('ascii'))
+        print('New Files downloaded')
+    
 def createMD5SUM():
     x = md5sum.grab_files(FILE_PATH)
     lista = []
@@ -93,14 +140,23 @@ def closeConnection():
     sock.close()
     print('connection closed')
 
-def setTCPIP(name):
-    TCP_IP = name
-
-def setPort(port):
-    TCP_PORT = int(port)
-
-def setFilePath(filepath):
-    FILE_PATH = filepath
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--file', help='Set the folder to sync', default=FILE_PATH)
+    parser.add_argument('-i', '--ip', help='Set IP of sync server', default=TCP_IP)
+    parser.add_argument('-p', '--port', help='Set Port of server', default=TCP_PORT)
+    
+    args = parser.parse_args()
+    setInit(args)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect((TCP_IP, TCP_PORT))
+    except ConnectionRefusedError:
+        print('Cant connect to server')
+        os.exit()
+    run()
+    
+    
 ##for main.py
 ##comparing md5sum
 ##createMD5SUM()

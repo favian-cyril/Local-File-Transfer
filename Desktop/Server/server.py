@@ -4,6 +4,7 @@ import time
 from threading import Thread
 import os
 import shutil
+import datetime
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -20,28 +21,31 @@ class ClientThread(Thread):
         print(" New thread started for "+ip+":"+str(port))
 
     def run(self):
-        protocol = self.sock.recv(BUFFER_SIZE)
-        if protocol.decode('ascii') == 'MD5SUM_COMPARE':
-            self.createMD5SUM()
-            self.recFile(name='MD5Client\\MD5SUM'+str(port)+'.txt')
-            listDiff = md5sum.compareFileDifference('MD5SUM.txt','MD5Client\\MD5SUM'+str(port)+'.txt')
-            print(listDiff)
-            for (file, status) in listDiff:
-                if status == 'MISMATCH' or status == 'MISSING':
-                    self.sock.send(file.encode('ascii'))
-                    self.sendFile(file)
-            self.sock.send('FILES_MATCH'.encode('ascii'))
-        if protocol.decode('ascii') == 'FILE_UPLOAD':
-            name = self.sock.recv(BUFFER_SIZE)
-            self.recFile(name.decode('ascii'))
-            self.createMD5SUM()
-        if protocol.decode('ascii') == 'FILE_DELETE':
-            name = self.sock.recv(BUFFER_SIZE)
-            try:
-                os.remove(name.decode('ascii'))
-            except:
-                shutil.rmtree(name.decode('ascii'))
-            self.createMD5SUM()
+        date = datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
+        self.sock.send(date.encode('ascii'))
+        while True:
+            protocol = self.sock.recv(BUFFER_SIZE)
+            if protocol.decode('ascii') == 'MD5SUM_COMPARE':
+                self.createMD5SUM()
+                self.recFile(name='MD5Client\\MD5SUM'+str(port)+'.txt')
+                listDiff = md5sum.compareFileDifference('MD5SUM.txt','MD5Client\\MD5SUM'+str(port)+'.txt')
+                for (file, status) in listDiff:
+                    if status == 'MISMATCH' or status == 'MISSING':
+                        self.sock.send(file.encode('ascii'))
+                        self.sendFile(file)
+                time.sleep(0.5)
+                self.sock.send('FILES_MATCH'.encode('ascii'))
+            if protocol.decode('ascii') == 'FILE_UPLOAD':
+                name = self.sock.recv(BUFFER_SIZE)
+                self.recFile(name.decode('ascii'))
+                self.createMD5SUM()
+            if protocol.decode('ascii') == 'FILE_DELETE':
+                name = self.sock.recv(BUFFER_SIZE)
+                try:
+                    os.remove(name.decode('ascii'))
+                except:
+                    shutil.rmtree(name.decode('ascii'))
+                self.createMD5SUM()
             
     def sendFile(self, filename):
         file = open(filename,'rb')
@@ -74,10 +78,8 @@ class ClientThread(Thread):
             with open(name, 'wb') as f:
                 while True:
                     data = self.sock.recv(BUFFER_SIZE)
-                    print('data=%s', (data.decode('ascii')))
                     if data.decode('ascii') == 'END_FILE_TRANSFER':
                         f.close()
-                        print('file close()')
                         break
                     f.write(data)
         except FileNotFoundError:
@@ -94,20 +96,19 @@ class ClientThread(Thread):
             with open(name[-1], 'wb') as f:
                 while True:
                     data = self.sock.recv(BUFFER_SIZE)
-                    print('data=%s', (data.decode('ascii')))
                     if data.decode('ascii') == 'END_FILE_TRANSFER':
                         f.close()
-                        print('file close()')
                         break
                     f.write(data)
 
-###for main.py
+
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 tcpsock.bind((TCP_IP, TCP_PORT))
 threads = []
 
 while True:
+    print('Server ready to sync')
     tcpsock.listen(5)
     (conn, (ip,port)) = tcpsock.accept()
     newthread = ClientThread(ip,port,conn)
