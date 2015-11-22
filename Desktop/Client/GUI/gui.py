@@ -1,41 +1,33 @@
-#import the 'tkinter' module
-import tkinter
-#create a new window
-window = tkinter.Tk()
-#set the window background to hex code '#a1dbcd'
-window.configure(background="#a1dbcd")
-#set the window title
-window.title("Welcome")
-#set the window icon
-window.wm_iconbitmap('Icon.ico')
+from tkinter import *
 
-photo = tkinter.PhotoImage(file="title.gif")
-w = tkinter.Label(window, image=photo)
-w.pack()
+class Window(Tk):
+    def __init__(self, parent):
+        Tk.__init__(self, parent)
+        self.parent = parent
+        self.initialize()
 
-#create a label for the instructions
-lblInst = tkinter.Label(window, text="Please login to continue:", fg="#383a39", bg="#a1dbcd", font=("Helvetica", 16))
-#and pack it into the window
-lblInst.pack()
+    def initialize(self):
+        # Connect window
+        self.geometry("300x150+30+30")
+        self.wButton = Button(self, text='Connect', command = self.OnButtonClick)
+        self.wButton.pack()
 
-#create the widgets for entering a username
-lblUsername = tkinter.Label(window, text="Username:", fg="#383a39", bg="#a1dbcd")
-entUsername = tkinter.Entry(window)
-#and pack them into the window
-lblUsername.pack()
-entUsername.pack()
+    def OnButtonClick(self):
+        # Initialize 'Sync Kong' main window after user has connected
+        self.top = Toplevel()
+        self.top.title("Sync Kong")
+        self.top.geometry("600x400+30+30")
+        self.top.transient(self)
+        self.wButton.config(state='disabled')
+        self.topButton = Button(self.top, text="CLOSE", command = self.OnChildClose)
+        self.topButton.pack()
 
-#create the widgets for entering a username
-lblPassword = tkinter.Label(window, text="Password:", fg="#383a39", bg="#a1dbcd")
-entPassword = tkinter.Entry(window)
-#and pack them into to the window
-lblPassword.pack()
-entPassword.pack()
+    def OnChildClose(self):
+        # Close and go back to 'Connect' state
+        self.wButton.config(state='normal')
+        self.top.destroy()
 
-#create a button widget called btn
-btn = tkinter.Button(window, text="Login", fg="#a1dbcd", bg="#383a39")
-#pack the widget into the window
-btn.pack()
-
-#draw the window, and start the 'application'
-window.mainloop()
+if __name__ == "__main__":
+    window = Window(None)
+    window.title("Connect To Sync Kong")
+    window.mainloop()
