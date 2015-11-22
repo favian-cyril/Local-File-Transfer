@@ -1,7 +1,6 @@
 import socket
 import md5sum
 import time
-import os
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -34,6 +33,7 @@ def sendMD5SUM():
             break
     
 def recFile(name):
+<<<<<<< HEAD
     """
     Recieve and create file, if directory not found then create
     directory 
@@ -88,6 +88,20 @@ def delFile(filename):
     sock.send('FILE_DELETE'.encode('ascii'))
     sock.send(filename.encode('ascii'))
 
+=======
+    with open(name, 'wb') as f:
+        print('file opened')
+        while True:
+            #print('receiving data...')
+            data = sock.recv(BUFFER_SIZE)
+            print('data=%s', (data))
+            if data.decode('ascii') == 'END_FILE_TRANSFER':
+                f.close()
+                print('file close()')
+                break
+            # write data to a file
+            f.write(data)
+>>>>>>> 067a4d55ad057833e793b7b05e8d76cc2143ce5d
 def closeConnection():
     sock.close()
     print('connection closed')
