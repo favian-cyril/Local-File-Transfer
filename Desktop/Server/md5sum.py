@@ -40,6 +40,16 @@ def createFile(arrPath,name='MD5SUM.txt'):
     for name, filedir in arrPath:
         print(name, filedir, file=filetext)
     print("File MD5SUM Created")
+
+def compareLocalMD5(arrPath):
+    """
+    Compares local file with latest MD5SUM
+    """
+    localMD5 = []
+    for name, filedir in arrPath:
+        localMD5.append([name,filedir])
+    print(localMD5)
+    
 def compareFileDifference(checksum1 = None, checksum2 = None):
     """
     TODO: Compare actual file difference and
@@ -49,10 +59,24 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
     fileMD = open(checksum1, "r").read()
     fileMDOutput = open(checksum2, "r").read()
     # Split 'em and put 'em as dicks
-    listMD = fileMD.split()
-    listMDOutput = fileMDOutput.split()
+    listMD = fileMD.split("\n")
+    listMDOutput = fileMDOutput.split("\n")
+
+    temp =[]
+    for i in listMD:
+        temp.append(i[:-33])
+        temp.append(i[-32:])
+    listMD = temp
+    temp =[]
+    for i in listMDOutput:
+        temp.append(i[:-33])
+        temp.append(i[-32:])
+    listMDOutput = temp
+
     dictMD = dict(zip(*[iter(listMD)]*2))
     dictMDOutput = dict(zip(*[iter(listMDOutput)]*2))
+    
+    
     # Determine which have the same key and same md5 value
     result = []
     for key in dictMD:
@@ -68,6 +92,7 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
             result.append((key, "MISSING"))
     return result
 
+<<<<<<< HEAD
 
 ##    x = md5sum.grab_files(FILE_PATH)
 ##    lista = []
@@ -75,5 +100,13 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
 ##        y = md5sum.md5(i)
 ##        lista.append((i,y))
 ##    md5sum.createFile(lista)
+=======
+##x = grab_files('.')
+##lista = []
+##for i in x:
+##    y = md5(i[1])
+##    lista.append((i[0],y))
+##createFile(lista)
+>>>>>>> e75be73668e5d8709482f7e439f9a6127dc0e4c4
 
     
