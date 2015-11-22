@@ -92,11 +92,11 @@ def closeConnection():
     sock.close()
     print('connection closed')
 
-createMD5SUM()
-sendMD5SUM()
-name = sock.recv(BUFFER_SIZE)
-if name.decode('ascii') == 'FILES_MATCH':
-    closeConnection()
-else:
-    recFile(name.decode('ascii'))
+##createMD5SUM()
+##sendMD5SUM()
+##name = sock.recv(BUFFER_SIZE) #NOTE 
+##if name.decode('ascii') == 'FILES_MATCH':
+##    closeConnection()
+##else:
+##    recFile(name.decode('ascii'))
 

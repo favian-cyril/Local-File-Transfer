@@ -2,11 +2,13 @@ import socket
 import md5sum
 import time
 from threading import Thread
+import os
+import shutil
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 1024
-#TEsting
+
 class ClientThread(Thread):
 
     def __init__(self,ip,port,sock):
@@ -34,7 +36,10 @@ class ClientThread(Thread):
             self.createMD5SUM()
         if protocol.decode('ascii') == 'FILE_DELETE':
             name = self.sock.recv(BUFFER_SIZE)
-            os.removedirs(name)
+            try:
+                os.remove(name.decode('ascii'))
+            except:
+                shutil.rmtree(name.decode('ascii'))
             self.createMD5SUM()
             
     def sendFile(self, filename):
@@ -53,6 +58,7 @@ class ClientThread(Thread):
             
     def createMD5SUM(self):
         x = md5sum.grab_files('Data\\')
+        print(x)
         lista = []
         for i in x:
             y = md5sum.md5(i)
