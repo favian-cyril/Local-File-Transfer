@@ -8,6 +8,7 @@ import shutil
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 1024
+FILE_PATH = 'Data\\'
 
 class ClientThread(Thread):
 
@@ -57,8 +58,7 @@ class ClientThread(Thread):
                 break
             
     def createMD5SUM(self):
-        x = md5sum.grab_files('Data\\')
-        print(x)
+        x = md5sum.grab_files(FILE_PATH)
         lista = []
         for i in x:
             y = md5sum.md5(i)
@@ -67,7 +67,8 @@ class ClientThread(Thread):
             
     def recFile(self, name):
         """
-        Recieve single file from client
+        Recieve and create file, if directory not found then create
+        directory 
         """
         try:
             with open(name, 'wb') as f:
@@ -99,7 +100,8 @@ class ClientThread(Thread):
                         print('file close()')
                         break
                     f.write(data)
-        
+
+###for main.py
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 tcpsock.bind((TCP_IP, TCP_PORT))

@@ -8,8 +8,7 @@ TCP_PORT = 9001
 BUFFER_SIZE = 1024
 FILE_PATH = 'Data\\'
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((TCP_IP, TCP_PORT))
+
 def createMD5SUM():
     x = md5sum.grab_files(FILE_PATH)
     lista = []
@@ -94,11 +93,19 @@ def closeConnection():
     sock.close()
     print('connection closed')
 
+def setTCPIP(name):
+    TCP_IP = name
+
+def setPort(port):
+    TCP_PORT = int(port)
+
+def setFilePath(filepath):
+    FILE_PATH = filepath
+##for main.py
+##comparing md5sum
 ##createMD5SUM()
 ##sendMD5SUM()
-##name = sock.recv(BUFFER_SIZE) #NOTE 
-##if name.decode('ascii') == 'FILES_MATCH':
-##    closeConnection()
-##else:
-##    recFile(name.decode('ascii'))
-
+##name = sock.recv(BUFFER_SIZE) #NOTE: must infinite loop until all the name is finished 
+##recFile(name.decode('ascii'))
+##sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+##sock.connect((TCP_IP, TCP_PORT))
