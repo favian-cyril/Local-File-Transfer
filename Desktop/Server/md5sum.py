@@ -40,7 +40,11 @@ def createFile(arrPath,name='MD5SUM.txt'):
     for name, filedir in arrPath:
         print(name, filedir, file=filetext)
     print("File MD5SUM Created")
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 0d028e10f70f650021174bc190cc5f077d06492c
 def compareLocalMD5(path = None, checksum1 = 'MD5SUM.txt'):
     """
     Compares local file with latest MD5SUM. Input must be in the form of string
@@ -128,6 +132,18 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
     return result
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+##x = grab_files('.')
+##lista = []
+##for i in x:
+##    y = md5(i[1])
+##    lista.append((i[0],y))
+##createFile(lista)
+=======
+
+>>>>>>> 0d028e10f70f650021174bc190cc5f077d06492c
 ##    x = md5sum.grab_files(FILE_PATH)
 ##    lista = []
 ##    for i in x:
@@ -135,5 +151,6 @@ def compareFileDifference(checksum1 = None, checksum2 = None):
 ##        lista.append((i,y))
 ##    md5sum.createFile(lista)
 
+>>>>>>> origin/master
 
     
