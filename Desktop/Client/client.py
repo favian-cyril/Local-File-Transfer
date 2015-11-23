@@ -27,7 +27,6 @@ def connect():
         sock.connect((TCP_IP, TCP_PORT))
     except ConnectionRefusedError:
         print('Cant connect to server')
-        sys.exit()
 
 def run():
     """

@@ -50,15 +50,15 @@ class Window(Tk):
         # Exception: if IP address & Host fill is wrong, alert user
     def connect(self):
         client.setIP(self.entry1.get())    
-        client.setPort(int(self.entry2.get()))
         client.setPath(self.filepath)
         try:
+            client.setPort(int(self.entry2.get()))
             client.connect()
-        except:
-            self.warning()
-        else:
             client.run()
             self.OnButtonClick()
+        except:
+            self.warning()
+            
 
         
         
