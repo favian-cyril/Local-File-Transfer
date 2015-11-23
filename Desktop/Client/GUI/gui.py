@@ -9,7 +9,7 @@ class Window(Tk):
 
     def initialize(self):
         # Connect window
-        self.geometry("500x270+30+30")
+        self.geometry("500x350+30+30")
         # SyncKong's logo
         self.image = PhotoImage(file='welcome.gif')
         Label(self, image=self.image).pack()
@@ -21,10 +21,18 @@ class Window(Tk):
         Label(self, text="Host").pack()
         entry2 = Entry(self)
         entry2.pack()
+        Label(self, text="").pack()
+
+        # Set Path Directory Button
+        self.path = Button(self, text="Set Path", command=self.path, width=18)
+        self.path.pack()
+        self.filepath = 'Data/'
+        self.pathname = Label(self,text="Current path: {}".format(self.filepath))
+        self.pathname.pack()
+        Label(self, text="").pack()
 
         # Process to SyncKong app
         self.wButton = Button(self, text='Connect', command = self.OnButtonClick)
-        self.wButton.configure(bg="red")
         self.wButton.pack()
 
         # Exception: if IP address & Host fill is wrong, alert user
@@ -45,10 +53,6 @@ class Window(Tk):
         self.refresh = Button(self.top, text="Sync with Kong!", command=self.refresh)
         self.refresh.pack()
         
-        # Set Path Directory Button
-        self.path = Button(self.top, text="Set Path", command=self.path)
-        self.path.pack()
-        
         # Back To Connect Button
         self.backButton = Button(self.top, text="Back To Connect", command=self.OnChildClose)
         self.backButton.pack()
@@ -64,6 +68,7 @@ class Window(Tk):
     def path(self):
         # Get folder's directory
         self.filepath = askdirectory()
+        self.pathname['text'] = "Current path: {}".format(self.filepath)
     
 if __name__ == "__main__":
     window = Window(None)
