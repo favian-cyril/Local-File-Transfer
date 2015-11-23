@@ -4,12 +4,18 @@ import time
 from threading import Thread
 import os
 import shutil
+import argparse
 import datetime
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
+
+def setInit(args):
+    global TCP_IP, TCP_PORT
+    TCP_IP = args.ip
+    TCP_PORT = args.port
 
 class ClientThread(Thread):
 
@@ -109,19 +115,26 @@ class ClientThread(Thread):
                         break
                     f.write(data)
 
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--ip', help='Set IP of sync server', default=TCP_IP)
+    parser.add_argument('-p', '--port', help='Set Port of server', default=TCP_PORT)
+    
+    args = parser.parse_args()
+    setInit(args)
+    
+    tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    tcpsock.bind((TCP_IP, TCP_PORT))
+    threads = []
 
-tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-tcpsock.bind((TCP_IP, TCP_PORT))
-threads = []
+    while True:
+        print('Server ready to sync')
+        tcpsock.listen(5)
+        (conn, (ip,port)) = tcpsock.accept()
+        newthread = ClientThread(ip,port,conn)
+        newthread.start()
+        threads.append(newthread)
 
-while True:
-    print('Server ready to sync')
-    tcpsock.listen(5)
-    (conn, (ip,port)) = tcpsock.accept()
-    newthread = ClientThread(ip,port,conn)
-    newthread.start()
-    threads.append(newthread)
-
-for t in threads:
-    t.join()
+    for t in threads:
+        t.join()
