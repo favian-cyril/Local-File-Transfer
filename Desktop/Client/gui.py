@@ -11,7 +11,7 @@ class Window(Tk):
         # Connect window
         self.geometry("500x350+30+30")
         # SyncKong's logo
-        self.image = PhotoImage(file='welcome.gif')
+        self.image = PhotoImage(file='assets/welcome.gif')
         Label(self, image=self.image).pack()
 
         # Connect form
@@ -46,7 +46,7 @@ class Window(Tk):
         self.wButton.config(state='disabled')
         
         # SyncKong's logo
-        self.top.image = PhotoImage(file='gorilla.gif')
+        self.top.image = PhotoImage(file='assets/gorilla.gif')
         Label(self.top, image=self.top.image).pack()
 
         # Sync Button
