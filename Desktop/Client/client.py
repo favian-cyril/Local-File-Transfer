@@ -1,11 +1,13 @@
 import socket, md5sum, time, os, sys, argparse, shutil
+from threading import Timer
 
 #Global variables
-global TCP_IP, TCP_PORT, FILE_PATH
+global TCP_IP, TCP_PORT, FILE_PATH, LATEST_UPDATE
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
+LATEST_UPDATE = 'No new updates'
 
 def setInit(args):
     """
@@ -15,11 +17,24 @@ def setInit(args):
     TCP_PORT = args.port
     FILE_PATH = args.file
 
+def connect():
+    """
+    connect to socket
+    """
+    global sock
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect((TCP_IP, TCP_PORT))
+    except ConnectionRefusedError:
+        print('Cant connect to server')
+        sys.exit()
+
 def run():
     """
     Controls the interval between calling updateLocalFiles() and
     checkWithServer()
     """
+    print("Server ip: {}\nPort: {}\nPath: {}".format(TCP_IP,TCP_PORT,FILE_PATH))
     if not os.access(FILE_PATH, os.F_OK):
         os.mkdir(FILE_PATH)
     print('Syncing with server...')
@@ -27,28 +42,37 @@ def run():
     print('Server time is {}'.format(date.decode('ascii')))
     checkWithServer()
     print('Client Up-to-date')
-    while True:
-        time.sleep(3)
-        if not updateLocalFiles():
-            checkWithServer()
-        time.sleep(3)
-        
-    
+    sync()
+
+def sync():
+    global threadsync
+    if not updateLocalFiles():
+        checkWithServer()
+    threadsync = Timer(6, sync)
+    threadsync.start()
+
+def stopSync():
+    threadsync.cancel()
+
 def updateLocalFiles():
     """
     Checks if there is a change (update or delete) in the client
     file using compareLocalMD5() from md5sum
     """
+    global LATEST_UPDATE
     change = False
     result = md5sum.compareLocalMD5(FILE_PATH)
     for (file,status) in result:
         if status == 'UPDATE' or status == 'UPLOAD':
             sendFile(file)
             change = True
+            LATEST_UPDATE = file + ' ' +status
+            print(LATEST_UPDATE)
             print('Changes Sent')
         elif status == 'DELETE':
             delFile(file)
             change = True
+            LATEST_UPDATE = file + ' ' +status
             print('Changes Sent')
         elif status == 'MATCH':
             pass
@@ -60,18 +84,22 @@ def checkWithServer():
     new files are downloaded. When initialising with server, any
     extra files are deleted.
     """
+    global LATEST_UPDATE
     createMD5SUM()
     sendMD5SUM()
     prot = sock.recv(BUFFER_SIZE)
     while True:
-        if prot.decode('ascii') == 'MISSINGCLIENT':
+        if prot == b'MISSINGCLIENT':
+            time.sleep(0.1)
             name = sock.recv(BUFFER_SIZE)
             if name.decode('ascii') == 'FILES_MATCH':
                 break
+            time.sleep(0.1)
             recFile(name.decode('ascii'))
+            LATEST_UPDATE = name.decode('ascii') + ' Downloaded'
             createMD5SUM()
             print('New Files downloaded')
-        elif prot.decode('ascii') == 'MISSINGSERVER':
+        elif prot == b'MISSINGSERVER':
             name = sock.recv(BUFFER_SIZE)
             if name.decode('ascii') == 'FILES_MATCH':
                 break
@@ -79,10 +107,14 @@ def checkWithServer():
                 os.remove(name.decode('ascii'))
             except:
                 shutil.rmtree(name.decode('ascii'))
+            LATEST_UPDATE = name.decode('ascii') + ' Removed'
             print('Extra file removed')
         elif prot.decode('ascii') == 'FILES_MATCH':
             break
-        
+
+def lastUpdate():
+    return LATEST_UPDATE
+
 def createMD5SUM():
     """
     Create md5sum.txt from file path
@@ -126,6 +158,7 @@ def recFile(name):
                     break
                 f.write(data)
     except FileNotFoundError:
+        current = os.getcwd()
         os.chdir(FILE_PATH)
         name = name.split('\\')
         filepath = name[:-1]
@@ -143,7 +176,7 @@ def recFile(name):
                     f.close()
                     break
                 f.write(data)
-
+        os.chdir(current)
 
 def sendFile(filename):
     """
@@ -173,17 +206,21 @@ def delFile(filename):
     sock.send(filename.encode('ascii'))
 
 def closeConnection():
+    stopSync()
     sock.close()
     print('connection closed')
 
 #Constructor function
 def setPath(path):
+    global FILE_PATH
     FILE_PATH = path
 
 def setIP(ip):
+    global TCP_IP
     TCP_IP = ip
 
 def setPort(port):
+    global TCP_PORT
     TCP_PORT = port
     
 
@@ -195,10 +232,5 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     setInit(args)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.connect((TCP_IP, TCP_PORT))
-    except ConnectionRefusedError:
-        print('Cant connect to server')
-        sys.exit()
+    connect()
     run()

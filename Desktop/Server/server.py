@@ -1,19 +1,17 @@
-import socket
-import md5sum
-import time
+import socket, md5sum, time, os, shutil, argparse, datetime
 from threading import Thread
-import os
-import shutil
-import argparse
-import datetime
 
+#Global variables
+global TCP_IP, TCP_PORT, FILE_PATH
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
 
 def setInit(args):
-    global TCP_IP, TCP_PORT
+    """
+    Initialise when arguments are parsed
+    """
     TCP_IP = args.ip
     TCP_PORT = args.port
 
@@ -27,6 +25,9 @@ class ClientThread(Thread):
         print(" New thread started for "+ip+":"+str(port))
 
     def run(self):
+        """
+        Do request from client depending on the procotol sent
+        """
         date = datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")
         self.sock.send(date.encode('ascii'))
         while True:
@@ -50,6 +51,7 @@ class ClientThread(Thread):
             if protocol.decode('ascii') == 'FILE_UPLOAD':
                 name = self.sock.recv(BUFFER_SIZE)
                 self.recFile(name.decode('ascii'))
+                print('Recieved {} from {}'.format(name.decode('ascii'), str(self.port)))
                 self.createMD5SUM()
             if protocol.decode('ascii') == 'FILE_DELETE':
                 name = self.sock.recv(BUFFER_SIZE)
@@ -57,9 +59,13 @@ class ClientThread(Thread):
                     os.remove(name.decode('ascii'))
                 except:
                     shutil.rmtree(name.decode('ascii'))
+                print('Deleted {} by {}'.format(name.decode('ascii'), str(self.port)))
                 self.createMD5SUM()
             
     def sendFile(self, filename):
+        """
+        Open file and send the data in bytes to current socket
+        """
         file = open(filename,'rb')
         while True:
             data = file.read(BUFFER_SIZE)
@@ -74,6 +80,9 @@ class ClientThread(Thread):
                 break
             
     def createMD5SUM(self):
+        """
+        Create md5sum.txt from file path
+        """   
         x = md5sum.grab_files(FILE_PATH)
         lista = []
         for i in x:
@@ -92,7 +101,6 @@ class ClientThread(Thread):
                     data = self.sock.recv(BUFFER_SIZE)
                     if data == b'END_FILE_TRANSFER':
                         f.close()
-                        print('file close()')
                         break
                     f.write(data)
         except FileNotFoundError:
@@ -111,7 +119,6 @@ class ClientThread(Thread):
                     data = self.sock.recv(BUFFER_SIZE)
                     if data == b'END_FILE_TRANSFER':
                         f.close()
-                        print('file close()')
                         break
                     f.write(data)
 
