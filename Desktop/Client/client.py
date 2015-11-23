@@ -13,6 +13,7 @@ def setInit(args):
     """
     Initialise when arguments are parsed
     """
+    global TCP_IP, TCP_PORT, FILE_PATH, LATEST_UPDATE
     TCP_IP = args.ip
     TCP_PORT = args.port
     FILE_PATH = args.file

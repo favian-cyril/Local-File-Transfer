@@ -2,7 +2,7 @@ import socket, md5sum, time, os, shutil, argparse, datetime
 from threading import Thread
 
 #Global variables
-global TCP_IP, TCP_PORT, FILE_PATH
+global TCP_IP, TCP_PORT, BUFFER_SIZE, FILE_PATH
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 4096
@@ -12,6 +12,7 @@ def setInit(args):
     """
     Initialise when arguments are parsed
     """
+    global TCP_IP, TCP_PORT
     TCP_IP = args.ip
     TCP_PORT = args.port
 
