@@ -30,9 +30,15 @@ class ClientThread(Thread):
                 self.recFile(name='MD5Client\\MD5SUM'+str(port)+'.txt')
                 listDiff = md5sum.compareFileDifference('MD5SUM.txt','MD5Client\\MD5SUM'+str(port)+'.txt')
                 for (file, status) in listDiff:
-                    if status == 'MISMATCH' or status == 'MISSING':
+                    if status == 'MISMATCH' or status == 'MISSINGCLIENT':
+                        self.sock.send('MISSINGCLIENT'.encode('ascii'))
+                        time.sleep(0.1)
                         self.sock.send(file.encode('ascii'))
                         self.sendFile(file)
+                    if status == 'MISSINGSERVER':
+                        self.sock.send('MISSINGSERVER'.encode('ascii'))
+                        time.sleep(0.1)
+                        self.sock.send(file.encode('ascii'))
                 time.sleep(0.5)
                 self.sock.send('FILES_MATCH'.encode('ascii'))
             if protocol.decode('ascii') == 'FILE_UPLOAD':

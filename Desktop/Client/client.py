@@ -1,8 +1,9 @@
 import socket
 import md5sum
 import time
-import os
+import os, sys
 import argparse
+import shutil
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
@@ -49,13 +50,26 @@ def updateLocalFiles():
 def checkWithServer():
     createMD5SUM()
     sendMD5SUM()
+    prot = sock.recv(BUFFER_SIZE)
     while True:
-        name = sock.recv(BUFFER_SIZE)
-        if name.decode('ascii') == 'FILES_MATCH':
+        if prot.decode('ascii') == 'MISSINGCLIENT':
+            name = sock.recv(BUFFER_SIZE)
+            if name.decode('ascii') == 'FILES_MATCH':
+                break
+            recFile(name.decode('ascii'))
+            print('New Files downloaded')
+        elif prot.decode('ascii') == 'MISSINGSERVER':
+            name = sock.recv(BUFFER_SIZE)
+            if name.decode('ascii') == 'FILES_MATCH':
+                break
+            try:
+                os.remove(name.decode('ascii'))
+            except:
+                shutil.rmtree(name.decode('ascii'))
+            print('Extra file removed')
+        elif prot.decode('ascii') == 'FILES_MATCH':
             break
-        recFile(name.decode('ascii'))
-        print('New Files downloaded')
-    
+        
 def createMD5SUM():
     x = md5sum.grab_files(FILE_PATH)
     lista = []
@@ -153,7 +167,7 @@ if __name__ == '__main__':
         sock.connect((TCP_IP, TCP_PORT))
     except ConnectionRefusedError:
         print('Cant connect to server')
-        os.exit()
+        sys.exit()
     run()
     
     
