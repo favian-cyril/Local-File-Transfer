@@ -69,6 +69,7 @@ def checkWithServer():
             if name.decode('ascii') == 'FILES_MATCH':
                 break
             recFile(name.decode('ascii'))
+            createMD5SUM()
             print('New Files downloaded')
         elif prot.decode('ascii') == 'MISSINGSERVER':
             name = sock.recv(BUFFER_SIZE)
@@ -122,7 +123,6 @@ def recFile(name):
                 data = sock.recv(BUFFER_SIZE)
                 if data == b'END_FILE_TRANSFER':
                     f.close()
-                    print('file close()')
                     break
                 f.write(data)
     except FileNotFoundError:
@@ -141,9 +141,9 @@ def recFile(name):
                 data = sock.recv(BUFFER_SIZE)
                 if data == b'END_FILE_TRANSFER':
                     f.close()
-                    print('file close()')
                     break
                 f.write(data)
+
 
 def sendFile(filename):
     """
@@ -157,10 +157,10 @@ def sendFile(filename):
         data = file.read(BUFFER_SIZE)
         while data:
             sock.send(data)
-            print('Sent ',filename)
             data = file.read(BUFFER_SIZE)
         if not data:
             time.sleep(0.1)
+            print('Sent ',filename)
             sock.send('END_FILE_TRANSFER'.encode('ascii'))
             file.close()
             break
