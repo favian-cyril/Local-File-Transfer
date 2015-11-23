@@ -7,7 +7,7 @@ import shutil
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
 
 def setInit(args):
@@ -102,8 +102,7 @@ def recFile(name):
         with open(name, 'wb') as f:
             while True:
                 data = sock.recv(BUFFER_SIZE)
-                print('data=%s', (data.decode('ascii')))
-                if data.decode('ascii') == 'END_FILE_TRANSFER':
+                if data == b'END_FILE_TRANSFER':
                     f.close()
                     print('file close()')
                     break
@@ -122,8 +121,7 @@ def recFile(name):
         with open(name[-1], 'wb') as f:
             while True:
                 data = sock.recv(BUFFER_SIZE)
-                print('data=%s', (data.decode('ascii')))
-                if data.decode('ascii') == 'END_FILE_TRANSFER':
+                if data == b'END_FILE_TRANSFER':
                     f.close()
                     print('file close()')
                     break

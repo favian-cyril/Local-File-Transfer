@@ -8,7 +8,7 @@ import datetime
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
 
 class ClientThread(Thread):
@@ -59,10 +59,10 @@ class ClientThread(Thread):
             data = file.read(BUFFER_SIZE)
             while data:
                 self.sock.send(data)
-                print('Sent ',filename)
                 data = file.read(BUFFER_SIZE)
             if not data:
                 time.sleep(0.1)
+                print('Sent {} to {}'.format(filename,str(port)))
                 self.sock.send('END_FILE_TRANSFER'.encode('ascii'))
                 file.close()
                 break
@@ -75,7 +75,7 @@ class ClientThread(Thread):
             lista.append((i,y))
         md5sum.createFile(lista)
             
-    def recFile(self, name):
+    def recFile(self,name):
         """
         Recieve and create file, if directory not found then create
         directory 
@@ -84,8 +84,9 @@ class ClientThread(Thread):
             with open(name, 'wb') as f:
                 while True:
                     data = self.sock.recv(BUFFER_SIZE)
-                    if data.decode('ascii') == 'END_FILE_TRANSFER':
+                    if data == b'END_FILE_TRANSFER':
                         f.close()
+                        print('file close()')
                         break
                     f.write(data)
         except FileNotFoundError:
@@ -102,8 +103,9 @@ class ClientThread(Thread):
             with open(name[-1], 'wb') as f:
                 while True:
                     data = self.sock.recv(BUFFER_SIZE)
-                    if data.decode('ascii') == 'END_FILE_TRANSFER':
+                    if data == b'END_FILE_TRANSFER':
                         f.close()
+                        print('file close()')
                         break
                     f.write(data)
 
