@@ -9,32 +9,33 @@ class Window(Tk):
 
     def initialize(self):
         # Connect window
-        self.geometry("500x250+30+30")
-        self.label = Label(self, text='Please fill in below to access the application! \n')
-        self.label.pack()
-        
+        self.geometry("500x270+30+30")
+        # SyncKong's logo
+        self.image = PhotoImage(file='welcome.gif')
+        Label(self, image=self.image).pack()
+
+        # Connect form
         Label(self, text="IP Address").pack()
         entry1 = Entry(self)
         entry1.pack()
-
         Label(self, text="Host").pack()
         entry2 = Entry(self)
         entry2.pack()
 
-        # Continue to application main page
+        # Process to SyncKong app
         self.wButton = Button(self, text='Connect', command = self.OnButtonClick)
+        self.wButton.configure(bg="red")
         self.wButton.pack()
+
+        # Exception: if IP address & Host fill is wrong, alert user
 
     def OnButtonClick(self):
         # Initialize 'Sync Kong' main window after user has connected
         self.top = Toplevel()
         self.top.title("Sync Kong")
-        self.top.geometry("1200x500+30+30")
+        self.top.geometry("700x400+30+30")
         self.top.transient(self)
         self.wButton.config(state='disabled')
-        
-        self.top.label = Label(self.top, text='You have connected. Have fun!')
-        self.top.label.pack()
         
         # SyncKong's logo
         self.top.image = PhotoImage(file='gorilla.gif')
@@ -49,7 +50,7 @@ class Window(Tk):
         self.path.pack()
         
         # Back To Connect Button
-        self.backButton = Button(self.top, text="Back To Connect", command = self.OnChildClose)
+        self.backButton = Button(self.top, text="Back To Connect", command=self.OnChildClose)
         self.backButton.pack()
 
     def OnChildClose(self):
