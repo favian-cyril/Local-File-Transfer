@@ -32,7 +32,7 @@ class Window(Tk):
         Label(self, text="").pack()
 
         # Process to SyncKong app
-        self.wButton = Button(self, text='Connect', command = self.OnButtonClick)
+        self.wButton = Button(self, text='Connect', command =self.OnButtonClick)
         self.wButton.pack()
 
         # Exception: if IP address & Host fill is wrong, alert user
@@ -69,7 +69,11 @@ class Window(Tk):
         # Get folder's directory
         self.filepath = askdirectory()
         self.pathname['text'] = "Current path: {}".format(self.filepath)
-    
+
+    def warning(self):
+        # User get popup notification if auth is failed
+        self.warning = messagebox.showerror("Cannot connect to server", "Configuration error, please try again!")
+        
 if __name__ == "__main__":
     window = Window(None)
     window.title("Connect To Sync Kong")
