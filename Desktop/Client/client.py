@@ -1,22 +1,25 @@
-import socket
-import md5sum
-import time
-import os, sys
-import argparse
-import shutil
+import socket, md5sum, time, os, sys, argparse, shutil
 
+#Global variables
+global TCP_IP, TCP_PORT, FILE_PATH
 TCP_IP = 'localhost'
 TCP_PORT = 9001
 BUFFER_SIZE = 4096
 FILE_PATH = 'Data\\'
 
 def setInit(args):
-    global TCP_IP, TCP_PORT, FILE_PATH
+    """
+    Initialise when arguments are parsed
+    """
     TCP_IP = args.ip
     TCP_PORT = args.port
     FILE_PATH = args.file
 
 def run():
+    """
+    Controls the interval between calling updateLocalFiles() and
+    checkWithServer()
+    """
     if not os.access(FILE_PATH, os.F_OK):
         os.mkdir(FILE_PATH)
     print('Syncing with server...')
@@ -32,6 +35,10 @@ def run():
         
     
 def updateLocalFiles():
+    """
+    Checks if there is a change (update or delete) in the client
+    file using compareLocalMD5() from md5sum
+    """
     change = False
     result = md5sum.compareLocalMD5(FILE_PATH)
     for (file,status) in result:
@@ -48,6 +55,11 @@ def updateLocalFiles():
     createMD5SUM()
     return change
 def checkWithServer():
+    """
+    send current md5sum to server to compare with server files.
+    new files are downloaded. When initialising with server, any
+    extra files are deleted.
+    """
     createMD5SUM()
     sendMD5SUM()
     prot = sock.recv(BUFFER_SIZE)
@@ -71,6 +83,9 @@ def checkWithServer():
             break
         
 def createMD5SUM():
+    """
+    Create md5sum.txt from file path
+    """
     x = md5sum.grab_files(FILE_PATH)
     lista = []
     for i in x:
@@ -79,6 +94,9 @@ def createMD5SUM():
     md5sum.createFile(lista)
     
 def sendMD5SUM():
+    """
+    Send md5sum to server to compare
+    """
     sock.send('MD5SUM_COMPARE'.encode('ascii'))
     file = open('MD5SUM.txt', 'rb')
     time.sleep(0.1)
@@ -128,6 +146,9 @@ def recFile(name):
                 f.write(data)
 
 def sendFile(filename):
+    """
+    Open file and send the data in bytes to current socket
+    """
     sock.send('FILE_UPLOAD'.encode('ascii'))
     time.sleep(0.1)
     sock.send(filename.encode('ascii'))
@@ -145,12 +166,26 @@ def sendFile(filename):
             break
 
 def delFile(filename):
+    """
+    Request the server to delete file
+    """
     sock.send('FILE_DELETE'.encode('ascii'))
     sock.send(filename.encode('ascii'))
 
 def closeConnection():
     sock.close()
     print('connection closed')
+
+#Constructor function
+def setPath(path):
+    FILE_PATH = path
+
+def setIP(ip):
+    TCP_IP = ip
+
+def setPort(port):
+    TCP_PORT = port
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -167,13 +202,3 @@ if __name__ == '__main__':
         print('Cant connect to server')
         sys.exit()
     run()
-    
-    
-##for main.py
-##comparing md5sum
-##createMD5SUM()
-##sendMD5SUM()
-##name = sock.recv(BUFFER_SIZE) #NOTE: must infinite loop until all the name is finished 
-##recFile(name.decode('ascii'))
-##sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-##sock.connect((TCP_IP, TCP_PORT))
