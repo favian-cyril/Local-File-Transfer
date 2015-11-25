@@ -9,15 +9,19 @@ https://docs.python.org/3/library/threading.html
 
 https://docs.python.org/3/library/socket.html
 
-TODO:
-- Create thread for server to handle input while handling client NOTE:not priority
-- main.py to connect gui and modules. also to automatically do the file checking with server
-
 DONE:
 - Implement protocol for client-server interaction(file upload, file deletion)
 - send MD5SUM.txt
 - Client GUI
 - Implement MD5SUM check to find file difference
-- - Create module to check file and simultaneously compare to current MD5SUM.txt and return the update such as insertion or deletion. If there is a change then create new MD5SUM.txt 
+- Create module to check file and simultaneously compare to current MD5SUM.txt and return the update such as insertion or deletion. If there is a change then create new MD5SUM.txt 
+- main.py to connect gui and modules. also to automatically do the file checking with server
 
-NOTE: Basic operation for main.py can be found in client.py and server.py
+PROTOCOL NOTES:
+- MD5SUM_COMPARE : get file difference from server
+- MISSINGCLIENT : file missing in client -> download new file
+- MISSINGSERVER : file missing in server -> delete in client
+- FILES_MATCH : end of file compare
+- FILE_UPLOAD : new file from client
+- FILE_DELETE : client deletes file
+- END_FILE_TRANSFER : end of file data -> so that file can be closed
