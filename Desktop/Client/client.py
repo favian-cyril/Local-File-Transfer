@@ -153,6 +153,7 @@ def recFile(name):
         with open(name, 'wb') as f:
             while True:
                 data = sock.recv(BUFFER_SIZE)
+                print(data)
                 if data == b'END_FILE_TRANSFER':
                     f.close()
                     break
