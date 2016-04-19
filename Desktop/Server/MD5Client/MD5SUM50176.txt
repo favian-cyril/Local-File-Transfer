@@ -1,0 +1,2 @@
+Data\biologi.png 27f5c6eaa7dd5a4d8e6057844fd09f05
+Data\WO\Favian.txt d41d8cd98f00b204e9800998ecf8427e

@@ -92,7 +92,7 @@ def checkWithServer():
         if prot == b'MISSINGCLIENT':
             time.sleep(0.1)
             name = sock.recv(BUFFER_SIZE)
-            if name.decode('ascii') == 'FILES_MATCH':
+            if name == b'FILES_MATCH':
                 break
             time.sleep(0.1)
             recFile(name.decode('ascii'))
@@ -109,7 +109,7 @@ def checkWithServer():
                 shutil.rmtree(name.decode('ascii'))
             LATEST_UPDATE = name.decode('ascii') + ' Removed'
             print('Extra file removed')
-        elif prot.decode('ascii') == 'FILES_MATCH':
+        elif prot == b'FILES_MATCH':
             break
 
 def lastUpdate():
